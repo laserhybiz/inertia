@@ -1,37 +1,4 @@
-import {
-  CacheForOption,
-  FormDataConvertible,
-  LinkPrefetchOption,
-  mergeDataIntoQueryString,
-  Method,
-  PendingVisit,
-  PreserveStateOption,
-  Progress,
-} from './'
-
-export interface InertiaLinkOptions {
-  data?: Record<string, FormDataConvertible>
-  href: string | { url: string; method: Method }
-  method?: Method
-  headers?: Record<string, string>
-  preserveScroll?: PreserveStateOption
-  preserveState?: PreserveStateOption
-  replace?: boolean
-  only?: string[]
-  except?: string[]
-  onCancelToken?: (cancelToken: import('axios').CancelTokenSource) => void
-  onBefore?: () => void
-  onStart?: (visit: PendingVisit) => void
-  onProgress?: (progress: Progress) => void
-  onFinish?: (visit: PendingVisit) => void
-  onCancel?: () => void
-  onSuccess?: () => void
-  onError?: () => void
-  queryStringArrayFormat?: 'brackets' | 'indices'
-  async?: boolean
-  prefetch?: boolean | LinkPrefetchOption | LinkPrefetchOption[]
-  cacheFor?: CacheForOption | CacheForOption[]
-}
+import { InertiaLinkOptions, LinkPrefetchOption, mergeDataIntoQueryString, Method } from './'
 
 export default function resolveLinkOptions(options: InertiaLinkOptions) {
   const {

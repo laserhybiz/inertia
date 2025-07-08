@@ -124,6 +124,30 @@ export type Visit<T extends RequestPayload = RequestPayload> = {
   preserveUrl: boolean
 }
 
+export interface InertiaLinkOptions {
+  data?: Record<string, FormDataConvertible>
+  href: string | { url: string; method: Method }
+  method?: Method
+  headers?: Record<string, string>
+  preserveScroll?: PreserveStateOption
+  preserveState?: PreserveStateOption
+  replace?: boolean
+  only?: string[]
+  except?: string[]
+  onCancelToken?: (cancelToken: import('axios').CancelTokenSource) => void
+  onBefore?: () => void
+  onStart?: (visit: PendingVisit) => void
+  onProgress?: (progress: Progress) => void
+  onFinish?: (visit: PendingVisit) => void
+  onCancel?: () => void
+  onSuccess?: () => void
+  onError?: () => void
+  queryStringArrayFormat?: 'brackets' | 'indices'
+  async?: boolean
+  prefetch?: boolean | LinkPrefetchOption | LinkPrefetchOption[]
+  cacheFor?: CacheForOption | CacheForOption[]
+}
+
 export type GlobalEventsMap = {
   before: {
     parameters: [PendingVisit]
