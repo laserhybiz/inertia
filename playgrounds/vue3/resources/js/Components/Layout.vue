@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link, useLinkBindings, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
 const page = usePage()
@@ -13,6 +13,7 @@ const appName = computed(() => page.props.appName)
     <Link href="/" class="hover:underline" prefetch>Home</Link>
     <Link href="/users" class="hover:underline" prefetch :cache-for="['2s', '1m']">Users</Link>
     <Link href="/article" class="hover:underline" prefetch="click">Article</Link>
+    <button v-bind="useLinkBindings('/article')" class="hover:underline">Article 2</button>
     <Link href="/form" class="hover:underline" :prefetch="['mount', 'click']" cache-for="1m">Form</Link>
     <Link href="/logout" method="post" class="hover:underline">Logout</Link>
     <Link href="/goodbye" class="hover:underline">External</Link>

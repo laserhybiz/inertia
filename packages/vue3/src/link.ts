@@ -8,7 +8,7 @@ import {
   Progress,
 } from '@inertiajs/core'
 import { computed, defineComponent, DefineComponent, h, onMounted, onUnmounted, PropType } from 'vue'
-import useLink from './useLink'
+import { useLink } from './useLink'
 
 export interface InertiaLinkProps {
   as?: string
@@ -176,7 +176,7 @@ const Link: InertiaLink = defineComponent({
         {
           ...attrs,
           ...(elProps.value[tag.value] || {}),
-          'data-loading': link.value.inFlightCount.value > 0 ? '' : undefined,
+          'data-loading': link.value.loading.value ? '' : undefined,
           ...link.value.events,
         },
         slots,

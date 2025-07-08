@@ -1,9 +1,22 @@
 import { InertiaLinkOptions, Method, resolveLinkOptions, router, shouldIntercept } from '@inertiajs/core'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-export default function useLink(
+export function useLinkBindings(
   href: string | { url: string; method: Method },
-  options: Omit<InertiaLinkOptions, 'href'>,
+  options: Omit<InertiaLinkOptions, 'href'> = {},
+) {
+  const link = useLink(href, options)
+
+  return {
+    href: link.href,
+    'data-loading': link.loading.value ? '' : undefined,
+    ...link.events,
+  }
+}
+
+export function useLink(
+  href: string | { url: string; method: Method },
+  options: Omit<InertiaLinkOptions, 'href'> = {},
 ) {
   const inFlightCount = ref(0)
   const hoverTimeout = ref<number | null>(null)
@@ -33,7 +46,7 @@ export default function useLink(
   }
 
   const regularEvents = {
-    onClick: (event: MouseEvent) => {
+    onClick: (event) => {
       if (shouldIntercept(event)) {
         event.preventDefault()
         router.visit(resolved.href, visitParams)
@@ -46,7 +59,9 @@ export default function useLink(
       hoverTimeout.value = window.setTimeout(prefetch, 75)
     },
     onMouseleave: () => {
-      if (hoverTimeout.value !== null) clearTimeout(hoverTimeout.value)
+      if (hoverTimeout.value !== null) {
+        clearTimeout(hoverTimeout.value)
+      }
     },
     onClick: regularEvents.onClick,
   }
@@ -72,7 +87,7 @@ export default function useLink(
 
   return {
     href: resolved.href,
-    inFlightCount,
+    loading: computed(() => inFlightCount.value > 0),
     events: (() => {
       if (resolved.prefetchModes.includes('hover')) {
         return prefetchHoverEvents
@@ -90,7 +105,9 @@ export default function useLink(
       }
     },
     onUnmounted: () => {
-      if (hoverTimeout.value !== null) clearTimeout(hoverTimeout.value)
+      if (hoverTimeout.value !== null) {
+        clearTimeout(hoverTimeout.value)
+      }
     },
   }
 }
