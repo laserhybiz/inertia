@@ -1,6 +1,7 @@
 import { Router } from './router'
 
 export { default as createHeadManager } from './head'
+export { default as resolveLinkOptions } from './link'
 export { hide as hideProgress, reveal as revealProgress, default as setupProgress } from './progress'
 export { default as shouldIntercept } from './shouldIntercept'
 export * from './types'
