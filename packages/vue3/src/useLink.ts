@@ -1,17 +1,36 @@
 import { InertiaLinkOptions, Method, resolveLinkOptions, router, shouldIntercept } from '@inertiajs/core'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+
+// Global cache for link instances to avoid duplicate useLink() calls
+const linkCache = new Map<string, ReturnType<typeof useLink>>()
+
+// Function to create a unique cache key based on call location
+function getCallLocationKey(href: string | { url: string; method: Method }, options: Omit<InertiaLinkOptions, 'href'>) {
+  const error = new Error()
+  const stack = error.stack || ''
+  const callLocation = stack.split('\n')[3] || '' // Skip useLinkBindings and this function
+  return JSON.stringify({ href, options, callLocation })
+}
 
 export function useLinkBindings(
   href: string | { url: string; method: Method },
   options: Omit<InertiaLinkOptions, 'href'> = {},
 ) {
-  const link = useLink(href, options)
+  const cacheKey = getCallLocationKey(href, options)
 
-  return {
-    href: link.href,
-    'data-loading': link.loading.value ? '' : undefined,
-    ...link.events,
+  // Check if we already have a link for this exact call location
+  let link = linkCache.get(cacheKey)
+
+  if (!link) {
+    link = useLink(href, options)
+    linkCache.set(cacheKey, link)
   }
+
+  return reactive({
+    href: link.href,
+    'data-loading': computed(() => (link.loading.value ? '' : undefined)),
+    ...link.events,
+  })
 }
 
 export function useLink(
