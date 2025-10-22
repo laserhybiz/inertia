@@ -1,6 +1,7 @@
 import {
   ConfigureInertiaAppOptionsForCSR,
   ConfigureInertiaAppOptionsForSSR,
+  createPageResolver,
   InertiaAppResponse,
   InertiaAppSSRResponse,
   PageProps,
@@ -10,7 +11,7 @@ import {
 import { createSSRApp, DefineComponent, h, Plugin, App as VueApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import App, { InertiaApp, InertiaAppProps, plugin } from './app'
-import { createPageResolver, createVueApp } from './createVueApp'
+import { createVueApp } from './createVueApp'
 import { ComponentResolver } from './types'
 
 type SetupOptions<ElementType, SharedProps extends PageProps> = {
@@ -55,11 +56,15 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   render,
 }: InertiaAppOptionsForCSR<SharedProps> | InertiaAppOptionsForSSR<SharedProps>): InertiaAppResponse {
   if (!resolve && !pages) {
-    throw new Error('You must provide a `resolve` function or a `pages` object.')
+    throw new Error('You must provide either a `resolve` function or a `pages` object.')
   }
 
   if (!resolve) {
-    resolve = createPageResolver(pages!)
+    resolve = createPageResolver(pages!, {
+      patterns(page: string) {
+        return [`./pages/${page}.vue`, `/pages/${page}.vue`, `./Pages/${page}.vue`, `/Pages/${page}.vue`]
+      },
+    })
   }
 
   const isServer = typeof window === 'undefined'

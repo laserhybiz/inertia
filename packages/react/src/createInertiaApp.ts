@@ -4,13 +4,14 @@ import {
   InertiaAppResponse,
   InertiaAppSSRResponse,
   PageProps,
+  createPageResolver,
   router,
   setupProgress,
 } from '@inertiajs/core'
 import { ReactElement, createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import App, { InertiaAppProps, type InertiaApp } from './App'
-import { createPageResolver, createReactApp } from './createReactApp'
+import { createReactApp } from './createReactApp'
 import { ReactComponent } from './types'
 
 export type SetupOptions<ElementType, SharedProps extends PageProps> = {
@@ -59,11 +60,24 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   render,
 }: InertiaAppOptionsForCSR<SharedProps> | InertiaAppOptionsForSSR<SharedProps>): InertiaAppResponse {
   if (!resolve && !pages) {
-    throw new Error('You must provide a `resolve` function or a `pages` object.')
+    throw new Error('You must provide either a `resolve` function or a `pages` object.')
   }
 
   if (!resolve) {
-    resolve = createPageResolver(pages!)
+    resolve = createPageResolver(pages!, {
+      patterns(page: string) {
+        return [
+          `./pages/${page}.jsx`,
+          `/pages/${page}.jsx`,
+          `./Pages/${page}.jsx`,
+          `/Pages/${page}.jsx`,
+          `./pages/${page}.tsx`,
+          `/pages/${page}.tsx`,
+          `./Pages/${page}.tsx`,
+          `/Pages/${page}.tsx`,
+        ]
+      },
+    })
   }
 
   const isServer = typeof window === 'undefined'
