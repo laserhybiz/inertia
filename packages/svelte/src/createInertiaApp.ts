@@ -1,13 +1,13 @@
 import {
   router,
   setupProgress,
-  type CreateInertiaAppOptionsForCSR,
+  type ConfigureInertiaAppOptionsForCSR,
   type InertiaAppResponse,
   type PageProps,
 } from '@inertiajs/core'
 import { escape } from 'lodash-es'
 import App, { type InertiaAppProps } from './components/App.svelte'
-import type { ComponentResolver } from './types'
+import type { ComponentResolver, ResolvedComponent } from './types'
 
 type SvelteRenderResult = { html: string; head: string; css?: { code: string } }
 
@@ -17,13 +17,14 @@ type SetupOptions<SharedProps extends PageProps> = {
   props: InertiaAppProps<SharedProps>
 }
 
-// Svelte doesn't use CreateInertiaAppOptionsForSSR as it doesn't pass a
+// Svelte doesn't use ConfigureInertiaAppOptionsForSSR as it doesn't pass a
 // 'render' function, it calls it directly in the setup() method...
-type InertiaAppOptions<SharedProps extends PageProps> = CreateInertiaAppOptionsForCSR<
+type InertiaAppOptions<SharedProps extends PageProps> = ConfigureInertiaAppOptionsForCSR<
   SharedProps,
   ComponentResolver,
   SetupOptions<SharedProps>,
-  SvelteRenderResult | void
+  SvelteRenderResult | void,
+  ResolvedComponent
 >
 
 export default async function createInertiaApp<SharedProps extends PageProps = PageProps>({

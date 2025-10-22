@@ -388,12 +388,22 @@ export type InternalActiveVisit = ActiveVisit & {
 export type VisitId = unknown
 export type Component = unknown
 
+type IntertiaAppProgressOptions = {
+  delay?: number
+  color?: string
+  includeCSS?: boolean
+  showSpinner?: boolean
+}
+
 interface CreateInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn> {
   resolve: TComponentResolver
   setup: (options: TSetupOptions) => TSetupReturn
   title?: HeadManagerTitleCallback
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export interface CreateInertiaAppOptionsForCSR<
   SharedProps extends PageProps,
   TComponentResolver,
@@ -402,23 +412,61 @@ export interface CreateInertiaAppOptionsForCSR<
 > extends CreateInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn> {
   id?: string
   page?: Page<SharedProps>
-  progress?:
-    | false
-    | {
-        delay?: number
-        color?: string
-        includeCSS?: boolean
-        showSpinner?: boolean
-      }
+  progress?: false | IntertiaAppProgressOptions
   render?: undefined
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export interface CreateInertiaAppOptionsForSSR<
   SharedProps extends PageProps,
   TComponentResolver,
   TSetupOptions,
   TSetupReturn,
 > extends CreateInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn> {
+  id?: undefined
+  page: Page<SharedProps>
+  progress?: undefined
+  render: unknown
+}
+
+//
+
+type ConfigureInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn, TComponent> = {
+  setup?: (options: TSetupOptions) => TSetupReturn
+  title?: HeadManagerTitleCallback
+} & (
+  | {
+      pages: Record<string, TComponent>
+      resolve?: never
+    }
+  | {
+      pages?: never
+      resolve: TComponentResolver
+    }
+)
+
+export type ConfigureInertiaAppOptionsForCSR<
+  SharedProps extends PageProps,
+  TComponentResolver,
+  TSetupOptions,
+  TSetupReturn,
+  TComponent = Component,
+> = ConfigureInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn, TComponent> & {
+  id?: string
+  page?: Page<SharedProps>
+  progress?: false | IntertiaAppProgressOptions
+  render?: undefined
+}
+
+export type ConfigureInertiaAppOptionsForSSR<
+  SharedProps extends PageProps,
+  TComponentResolver,
+  TSetupOptions,
+  TSetupReturn,
+  TComponent = Component,
+> = ConfigureInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn, TComponent> & {
   id?: undefined
   page: Page<SharedProps>
   progress?: undefined

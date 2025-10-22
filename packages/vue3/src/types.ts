@@ -1,4 +1,4 @@
-import { createHeadManager, Page, PageHandler, PageProps, router, SharedPageProps } from '@inertiajs/core'
+import { HeadManager, Page, PageHandler, PageProps, router, SharedPageProps } from '@inertiajs/core'
 import { DefineComponent } from 'vue'
 import useForm from './useForm'
 
@@ -14,7 +14,7 @@ declare module 'vue' {
   export interface ComponentCustomProperties {
     $inertia: typeof router
     $page: Page<PageProps & SharedPageProps>
-    $headManager: ReturnType<typeof createHeadManager>
+    $headManager: HeadManager
   }
 
   export interface ComponentCustomOptions {

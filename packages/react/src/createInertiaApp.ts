@@ -1,6 +1,6 @@
 import {
-  CreateInertiaAppOptionsForCSR,
-  CreateInertiaAppOptionsForSSR,
+  ConfigureInertiaAppOptionsForCSR,
+  ConfigureInertiaAppOptionsForSSR,
   InertiaAppResponse,
   InertiaAppSSRResponse,
   PageProps,
@@ -23,18 +23,20 @@ type ComponentResolver = (
   name: string,
 ) => ReactComponent | Promise<ReactComponent> | { default: ReactComponent } | unknown
 
-type InertiaAppOptionsForCSR<SharedProps extends PageProps> = CreateInertiaAppOptionsForCSR<
+type InertiaAppOptionsForCSR<SharedProps extends PageProps> = ConfigureInertiaAppOptionsForCSR<
   SharedProps,
   ComponentResolver,
   SetupOptions<HTMLElement, SharedProps>,
-  void
+  void,
+  ReactComponent
 >
 
-type InertiaAppOptionsForSSR<SharedProps extends PageProps> = CreateInertiaAppOptionsForSSR<
+type InertiaAppOptionsForSSR<SharedProps extends PageProps> = ConfigureInertiaAppOptionsForSSR<
   SharedProps,
   ComponentResolver,
   SetupOptions<null, SharedProps>,
-  ReactElement
+  ReactElement,
+  ReactComponent
 > & {
   render: typeof renderToString
 }

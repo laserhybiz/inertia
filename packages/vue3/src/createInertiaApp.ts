@@ -1,6 +1,6 @@
 import {
-  CreateInertiaAppOptionsForCSR,
-  CreateInertiaAppOptionsForSSR,
+  ConfigureInertiaAppOptionsForCSR,
+  ConfigureInertiaAppOptionsForSSR,
   InertiaAppResponse,
   InertiaAppSSRResponse,
   PageProps,
@@ -20,18 +20,20 @@ type SetupOptions<ElementType, SharedProps extends PageProps> = {
   plugin: Plugin
 }
 
-type InertiaAppOptionsForCSR<SharedProps extends PageProps> = CreateInertiaAppOptionsForCSR<
+type InertiaAppOptionsForCSR<SharedProps extends PageProps> = ConfigureInertiaAppOptionsForCSR<
   SharedProps,
   ComponentResolver,
   SetupOptions<HTMLElement, SharedProps>,
-  void
+  void,
+  DefineComponent
 >
 
-type InertiaAppOptionsForSSR<SharedProps extends PageProps> = CreateInertiaAppOptionsForSSR<
+type InertiaAppOptionsForSSR<SharedProps extends PageProps> = ConfigureInertiaAppOptionsForSSR<
   SharedProps,
   ComponentResolver,
   SetupOptions<null, SharedProps>,
-  VueApp
+  VueApp,
+  DefineComponent
 > & {
   render: typeof renderToString
 }
@@ -54,7 +56,8 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   const isServer = typeof window === 'undefined'
   const el = isServer ? null : document.getElementById(id)
   const initialPage = page || JSON.parse(el?.dataset.page || '{}')
-  const resolveComponent = (name: string) => Promise.resolve(resolve(name)).then((module) => module.default || module)
+  const resolveComponent = (name: string) =>
+    Promise.resolve(resolve?.(name)).then((module) => module?.default || module)
 
   let head: string[] = []
 
