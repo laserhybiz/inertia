@@ -7,6 +7,7 @@ import {
 } from '@inertiajs/core'
 import { escape } from 'lodash-es'
 import App, { type InertiaAppProps } from './components/App.svelte'
+import { createPageResolver, createSvelteApp } from './createSvelteApp'
 import type { ComponentResolver, ResolvedComponent } from './types'
 
 type SvelteRenderResult = { html: string; head: string; css?: { code: string } }
@@ -25,7 +26,10 @@ type InertiaAppOptions<SharedProps extends PageProps> = ConfigureInertiaAppOptio
   SetupOptions<SharedProps>,
   SvelteRenderResult | void,
   ResolvedComponent
->
+> & {
+  hydrate?: Function
+  mount?: Function
+}
 
 export default async function createInertiaApp<SharedProps extends PageProps = PageProps>({
   id = 'app',
@@ -33,7 +37,18 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   setup,
   progress = {},
   page,
+  pages,
+  hydrate,
+  mount,
 }: InertiaAppOptions<SharedProps>): InertiaAppResponse {
+  if (!resolve && !pages) {
+    throw new Error('You must provide a `resolve` function or a `pages` object.')
+  }
+
+  if (!resolve) {
+    resolve = createPageResolver(pages!)
+  }
+
   const isServer = typeof window === 'undefined'
   const el = isServer ? null : document.getElementById(id)
   const initialPage = page || JSON.parse(el?.dataset.page || '{}')
@@ -43,11 +58,15 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
     resolveComponent(initialPage.component),
     router.decryptHistory().catch(() => {}),
   ]).then(([initialComponent]) => {
-    return setup({
-      el,
-      App,
-      props: { initialPage, initialComponent, resolveComponent },
-    })
+    const props = { initialPage, initialComponent, resolveComponent }
+
+    return setup
+      ? setup({
+          el,
+          App,
+          props,
+        })
+      : createSvelteApp(el, props, hydrate, mount)
   })
 
   if (isServer && svelteApp) {
