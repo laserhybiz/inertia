@@ -10,6 +10,7 @@ import {
 import { ReactElement, createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import App, { InertiaAppProps, type InertiaApp } from './App'
+import { createPageResolver, createReactApp } from './createReactApp'
 import { ReactComponent } from './types'
 
 export type SetupOptions<ElementType, SharedProps extends PageProps> = {
@@ -54,8 +55,17 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   title,
   progress = {},
   page,
+  pages,
   render,
 }: InertiaAppOptionsForCSR<SharedProps> | InertiaAppOptionsForSSR<SharedProps>): InertiaAppResponse {
+  if (!resolve && !pages) {
+    throw new Error('You must provide a `resolve` function or a `pages` object.')
+  }
+
+  if (!resolve) {
+    resolve = createPageResolver(pages!)
+  }
+
   const isServer = typeof window === 'undefined'
   const el = isServer ? null : document.getElementById(id)
   const initialPage = page || JSON.parse(el?.dataset.page || '{}')
@@ -73,6 +83,11 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
       initialComponent,
       resolveComponent,
       titleCallback: title,
+      onHeadUpdate: isServer ? (elements: string[]) => (head = elements) : undefined,
+    }
+
+    if (!setup) {
+      return createReactApp(el, props, isServer)
     }
 
     if (isServer) {
@@ -81,7 +96,7 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
       return ssrSetup({
         el: null,
         App,
-        props: { ...props, onHeadUpdate: (elements: string[]) => (head = elements) },
+        props,
       })
     }
 

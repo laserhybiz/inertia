@@ -438,7 +438,7 @@ type ConfigureInertiaAppOptions<TComponentResolver, TSetupOptions, TSetupReturn,
   title?: HeadManagerTitleCallback
 } & (
   | {
-      pages: Record<string, TComponent>
+      pages: Record<string, TComponent | (() => Promise<TComponent>)>
       resolve?: never
     }
   | {

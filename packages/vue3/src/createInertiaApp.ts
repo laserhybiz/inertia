@@ -10,8 +10,8 @@ import {
 import { createSSRApp, DefineComponent, h, Plugin, App as VueApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import App, { InertiaApp, InertiaAppProps, plugin } from './app'
-
-type ComponentResolver = (name: string) => DefineComponent | Promise<DefineComponent> | { default: DefineComponent }
+import { createPageResolver, createVueApp } from './createVueApp'
+import { ComponentResolver } from './types'
 
 type SetupOptions<ElementType, SharedProps extends PageProps> = {
   el: ElementType
@@ -51,13 +51,21 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   title,
   progress = {},
   page,
+  pages,
   render,
 }: InertiaAppOptionsForCSR<SharedProps> | InertiaAppOptionsForSSR<SharedProps>): InertiaAppResponse {
+  if (!resolve && !pages) {
+    throw new Error('You must provide a `resolve` function or a `pages` object.')
+  }
+
+  if (!resolve) {
+    resolve = createPageResolver(pages!)
+  }
+
   const isServer = typeof window === 'undefined'
   const el = isServer ? null : document.getElementById(id)
   const initialPage = page || JSON.parse(el?.dataset.page || '{}')
-  const resolveComponent = (name: string) =>
-    Promise.resolve(resolve?.(name)).then((module) => module?.default || module)
+  const resolveComponent = (name: string) => Promise.resolve(resolve(name)).then((module) => module?.default || module)
 
   let head: string[] = []
 
@@ -70,6 +78,11 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
       initialComponent,
       resolveComponent,
       titleCallback: title,
+      onHeadUpdate: isServer ? (elements: string[]) => (head = elements) : undefined,
+    }
+
+    if (!setup) {
+      return createVueApp(el, props, isServer)
     }
 
     if (isServer) {
@@ -78,7 +91,7 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
       return ssrSetup({
         el: null,
         App,
-        props: { ...props, onHeadUpdate: (elements: string[]) => (head = elements) },
+        props,
         plugin,
       })
     }
