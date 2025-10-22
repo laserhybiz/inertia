@@ -27,7 +27,7 @@ export function createPageResolver<T extends Record<string, any>>(
       `./Pages/${page}.tsx`,
       `/Pages/${page}.tsx`,
     ],
-    transform = (module: any) => module.default || module,
+    transform = (module: any) => module,
   } = options
 
   return async (name: string) => {

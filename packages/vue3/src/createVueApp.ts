@@ -22,7 +22,7 @@ export function createPageResolver<T extends Record<string, any>>(
       `./Pages/${page}.vue`,
       `/Pages/${page}.vue`,
     ],
-    transform = (module: any) => module.default || module,
+    transform = (module: any) => module,
   } = options
 
   return async (name: string) => {
