@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const lodash = require('lodash-es')
 
 const package = process.env.PACKAGE || 'vue3'
 
@@ -58,7 +59,8 @@ module.exports = {
       fs
         .readFileSync(path.resolve(__dirname, '../../packages/', package, 'test-app/dist/index.html'))
         .toString()
-        .replace("'{{ placeholder }}'", JSON.stringify(data)),
+        .replace("'{{ placeholder }}'", JSON.stringify(data))
+        .replace('{{ dataPage }}', lodash.escape(JSON.stringify(data))),
     )
   },
   location: (res, href) => res.status(409).header('X-Inertia-Location', href).send(''),

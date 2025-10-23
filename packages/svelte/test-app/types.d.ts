@@ -26,7 +26,7 @@ declare global {
   }
 
   interface ImportMeta {
-    readonly glob: <T>(pattern: string, options: { eager: true }) => Record<string, T>
+    readonly glob: <T>(pattern: string, options?: { eager: boolean }) => Record<string, T>
   }
 }
 

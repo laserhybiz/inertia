@@ -3,7 +3,6 @@ import { createInertiaApp, type ResolvedComponent, router } from '@inertiajs/sve
 window.testing = { Inertia: router }
 
 createInertiaApp({
-  page: window.initialPage,
   resolve: async (name) => {
     const pages = import.meta.glob<ResolvedComponent>('./Pages/**/*.svelte', { eager: true })
 
