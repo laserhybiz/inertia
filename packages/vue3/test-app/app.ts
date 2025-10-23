@@ -42,5 +42,4 @@ const scenarios: Record<string, () => void> = {
 }
 
 const scenario = new URLSearchParams(window.location.search).get('createInertiaApp') || 'default'
-console.log({ scenario })
 scenarios[scenario]()
