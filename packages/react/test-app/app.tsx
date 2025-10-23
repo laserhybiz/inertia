@@ -6,16 +6,6 @@ import { createRoot } from 'react-dom/client'
 window.testing = { Inertia: router }
 
 const scenarios: Record<string, () => void> = {
-  // @ts-expect-error - 'pages' xor 'resolve'
-  invalid: () => createInertiaApp({}),
-  pagesWithEagerLoading: () =>
-    createInertiaApp({
-      pages: import.meta.glob<ComponentType>('./Pages/**/*.tsx', { eager: true }),
-    }),
-  pagesWithoutEagerLoading: () =>
-    createInertiaApp({
-      pages: import.meta.glob<ComponentType>('./Pages/**/*.tsx', { eager: false }),
-    }),
   default: () =>
     createInertiaApp({
       resolve: async (name) => {
@@ -36,6 +26,16 @@ const scenarios: Record<string, () => void> = {
         delay: 0,
         color: 'red',
       },
+    }),
+  // @ts-expect-error - 'pages' xor 'resolve'
+  invalid: () => createInertiaApp({}),
+  pagesWithEagerLoading: () =>
+    createInertiaApp({
+      pages: import.meta.glob<ComponentType>('./Pages/**/*.tsx', { eager: true }),
+    }),
+  pagesWithoutEagerLoading: () =>
+    createInertiaApp({
+      pages: import.meta.glob<ComponentType>('./Pages/**/*.tsx', { eager: false }),
     }),
 }
 

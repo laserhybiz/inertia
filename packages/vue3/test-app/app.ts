@@ -1,21 +1,10 @@
-import { router } from '@inertiajs/core'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import type { DefineComponent } from 'vue'
 import { createApp, h } from 'vue'
 
 window.testing = { Inertia: router }
 
 const scenarios: Record<string, () => void> = {
-  // @ts-expect-error - 'pages' xor 'resolve'
-  invalid: () => createInertiaApp({}),
-  pagesWithEagerLoading: () =>
-    createInertiaApp({
-      pages: import.meta.glob<DefineComponent>('./Pages/**/*.vue', { eager: true }),
-    }),
-  pagesWithoutEagerLoading: () =>
-    createInertiaApp({
-      pages: import.meta.glob<DefineComponent>('./Pages/**/*.vue', { eager: false }),
-    }),
   default: () =>
     createInertiaApp({
       resolve: async (name) => {
@@ -38,6 +27,16 @@ const scenarios: Record<string, () => void> = {
 
         inst.mount(el)
       },
+    }),
+  // @ts-expect-error - 'pages' xor 'resolve'
+  invalid: () => createInertiaApp({}),
+  pagesWithEagerLoading: () =>
+    createInertiaApp({
+      pages: import.meta.glob<DefineComponent>('./Pages/**/*.vue', { eager: true }),
+    }),
+  pagesWithoutEagerLoading: () =>
+    createInertiaApp({
+      pages: import.meta.glob<DefineComponent>('./Pages/**/*.vue', { eager: false }),
     }),
 }
 
