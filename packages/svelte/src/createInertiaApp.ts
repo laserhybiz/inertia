@@ -60,7 +60,7 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   ]).then(([initialComponent]) => {
     const props = { initialPage, initialComponent, resolveComponent }
 
-    return setup({
+    return setup!({
       el,
       App,
       props,
