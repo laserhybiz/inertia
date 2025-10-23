@@ -64,27 +64,23 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   }
 
   if (!resolve) {
-    resolve = createPageResolver(pages!, {
-      patterns(page: string) {
-        return [
-          `./pages/${page}.jsx`,
-          `/pages/${page}.jsx`,
-          `./Pages/${page}.jsx`,
-          `/Pages/${page}.jsx`,
-          `./pages/${page}.tsx`,
-          `/pages/${page}.tsx`,
-          `./Pages/${page}.tsx`,
-          `/Pages/${page}.tsx`,
-        ]
-      },
-    })
+    resolve = createPageResolver<ReactComponent>(pages!, (page: string) => [
+      `./pages/${page}.jsx`,
+      `/pages/${page}.jsx`,
+      `./Pages/${page}.jsx`,
+      `/Pages/${page}.jsx`,
+      `./pages/${page}.tsx`,
+      `/pages/${page}.tsx`,
+      `./Pages/${page}.tsx`,
+      `/Pages/${page}.tsx`,
+    ])
   }
 
   const isServer = typeof window === 'undefined'
   const el = isServer ? null : document.getElementById(id)
   const initialPage = page || JSON.parse(el?.dataset.page || '{}')
   // @ts-expect-error - This can be improved once we remove the 'unknown' type from the resolver...
-  const resolveComponent = (name) => Promise.resolve(resolve(name)).then((module) => module.default || module)
+  const resolveComponent = (name: string) => Promise.resolve(resolve(name)).then((module) => module.default || module)
 
   let head: string[] = []
 
@@ -134,6 +130,7 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
         {
           id,
           'data-page': JSON.stringify(initialPage),
+          'data-server-rendered': 'true',
         },
         reactApp as ReactElement,
       ),

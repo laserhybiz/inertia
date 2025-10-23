@@ -1,6 +1,6 @@
 import { PageProps } from '@inertiajs/core'
 import { createElement, ReactElement } from 'react'
-import { hydrateRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import App, { InertiaAppProps } from './App'
 
 export function createReactApp<SharedProps extends PageProps = PageProps>(
@@ -18,14 +18,11 @@ export function createReactApp<SharedProps extends PageProps = PageProps>(
   })
 
   if (!isServer && el) {
-    hydrateRoot(el, appElement, {
-      onRecoverableError: (error: unknown) => {
-        if (error instanceof Error) {
-          // TODO: make configurable...
-          throw error
-        }
-      },
-    })
+    if (el.dataset.serverRendered === 'true') {
+      hydrateRoot(el, appElement)
+    } else {
+      createRoot(el).render(appElement)
+    }
   }
 
   return appElement

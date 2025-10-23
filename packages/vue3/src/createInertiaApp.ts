@@ -60,11 +60,12 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   }
 
   if (!resolve) {
-    resolve = createPageResolver(pages!, {
-      patterns(page: string) {
-        return [`./pages/${page}.vue`, `/pages/${page}.vue`, `./Pages/${page}.vue`, `/Pages/${page}.vue`]
-      },
-    })
+    resolve = createPageResolver<DefineComponent>(pages!, (page: string) => [
+      `./pages/${page}.vue`,
+      `/pages/${page}.vue`,
+      `./Pages/${page}.vue`,
+      `/Pages/${page}.vue`,
+    ])
   }
 
   const isServer = typeof window === 'undefined'
@@ -122,6 +123,7 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
           h('div', {
             id,
             'data-page': JSON.stringify(initialPage),
+            'data-server-rendered': 'true',
             innerHTML: vueApp ? render(vueApp) : '',
           }),
       }),

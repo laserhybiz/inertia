@@ -41,11 +41,12 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   }
 
   if (!resolve) {
-    resolve = createPageResolver(pages!, {
-      patterns(page: string) {
-        return [`./pages/${page}.svelte`, `/pages/${page}.svelte`, `./Pages/${page}.svelte`, `/Pages/${page}.svelte`]
-      },
-    })
+    resolve = createPageResolver<ResolvedComponent>(pages!, (page: string) => [
+      `./pages/${page}.svelte`,
+      `/pages/${page}.svelte`,
+      `./Pages/${page}.svelte`,
+      `/Pages/${page}.svelte`,
+    ])
   }
 
   const isServer = typeof window === 'undefined'

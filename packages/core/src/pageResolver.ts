@@ -1,27 +1,24 @@
-export interface PageResolverOptions {
-  /**
-   * Transform function to extract the component from the module
-   * @default (module) => module
-   */
-  patterns: (page: string) => string[]
-  transform?: (module: any) => any
-}
+export default function createPageResolver<TComponent>(
+  pages: Record<string, TComponent | (() => Promise<TComponent>)>,
+  resolver: (page: string) => string | string[],
+): (name: string) => Promise<TComponent> {
+  return (name: string) => {
+    const resolved = resolver(name)
 
-export default function createPageResolver<TPages extends Record<string, any>>(
-  pages: TPages,
-  options: PageResolverOptions,
-) {
-  const { patterns, transform = (module: any) => module } = options
+    for (const name of Array.isArray(resolved) ? resolved : [resolved]) {
+      const page = pages[name]
 
-  return async (name: string) => {
-    for (const pattern of patterns(name)) {
-      const page = pages[pattern]
-
-      if (page) {
-        return transform(typeof page === 'function' ? await page() : page)
+      if (!page) {
+        continue
       }
+
+      if (typeof page !== 'function') {
+        return Promise.resolve(page)
+      }
+
+      return (page as () => Promise<TComponent>)()
     }
 
-    throw new Error(`Page component "${name}" not found.`)
+    return Promise.reject(new Error(`Page component "${name}" not found.`))
   }
 }
