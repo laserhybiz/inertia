@@ -4,10 +4,7 @@ import createServer from '@inertiajs/svelte/server'
 createServer((page) =>
   createInertiaApp({
     page,
-    resolve: (name) => {
-      const pages = import.meta.glob<ResolvedComponent>('./Pages/**/*.svelte', { eager: true })
-      return pages[`./Pages/${name}.svelte`]
-    },
+    pages: import.meta.glob<ResolvedComponent>('./Pages/**/*.svelte', { eager: true }),
     setup({ App, props }) {
       return App.render(props)
     },

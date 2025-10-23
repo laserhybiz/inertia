@@ -26,10 +26,7 @@ type InertiaAppOptions<SharedProps extends PageProps> = ConfigureInertiaAppOptio
   SetupOptions<SharedProps>,
   SvelteRenderResult | void,
   ResolvedComponent
-> & {
-  hydrate?: Function
-  mount?: Function
-}
+>
 
 export default async function createInertiaApp<SharedProps extends PageProps = PageProps>({
   id = 'app',
@@ -62,13 +59,11 @@ export default async function createInertiaApp<SharedProps extends PageProps = P
   ]).then(([initialComponent]) => {
     const props = { initialPage, initialComponent, resolveComponent }
 
-    return setup
-      ? setup({
-          el,
-          App,
-          props,
-        })
-      : new App({ target: el!, props, hydrate: true })
+    return setup({
+      el,
+      App,
+      props,
+    })
   })
 
   if (isServer && svelteApp) {

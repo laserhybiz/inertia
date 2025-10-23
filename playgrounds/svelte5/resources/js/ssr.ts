@@ -1,16 +1,13 @@
 import { createInertiaApp, type ResolvedComponent } from '@inertiajs/svelte'
 import createServer from '@inertiajs/svelte/server'
-import { render } from 'svelte/server'
+import { mount } from 'svelte'
 
 createServer((page) =>
   createInertiaApp({
     page,
-    resolve: (name) => {
-      const pages = import.meta.glob<ResolvedComponent>('./Pages/**/*.svelte', { eager: true })
-      return pages[`./Pages/${name}.svelte`]
-    },
+    pages: import.meta.glob<ResolvedComponent>('./Pages/**/*.svelte', { eager: true }),
     setup({ App, props }) {
-      return render(App, { props })
+      return mount(App, { props })
     },
   }),
 )

@@ -1,11 +1,26 @@
-// export function createSvelteApp(el: HTMLElement | null, props: InertiaAppProps) {
-//   if (!hydrate || !mount) {
-//     return new App({ target: el!, props, hydrate: true })
-//   }
+import type { InertiaAppProps } from './components/App.svelte'
+import App from './components/App.svelte'
 
-//   if (el?.dataset.serverRendered === 'true') {
-//     return hydrate(App, { target: el, props })
-//   }
+export function createSvelteApp(
+  el: HTMLElement | null,
+  props: InertiaAppProps,
+  hydrate?: Function,
+  mount?: Function,
+  render?: Function,
+) {
+  if (!hydrate || !mount) {
+    // Svelte 4...
+    return new App({ target: el!, props, hydrate: true })
+  }
 
-//   return mount(App, { target: el, props })
-// }
+  if (typeof window === 'undefined' && render) {
+    // Svelte 5 SSR...
+    return render(App, { props })
+  }
+
+  if (el?.dataset.serverRendered === 'true') {
+    return hydrate(App, { target: el, props })
+  }
+
+  return mount(App, { target: el, props })
+}
